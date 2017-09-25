@@ -1,13 +1,5 @@
-var promise = require('bluebird');
+var db = require('./pg_config');
 
-var options = {
-    //Initialize Options
-    promiseLib: promise
-};
-
-var pgp = require('pg-promise')(options);
-var connectionString = 'postgres://localhost:5432/calendar';
-var db = pgp(connectionString);
 
 function getAllUsers(req, res, next) {
     db.any('select * from users')
@@ -28,7 +20,7 @@ function getSingleUser(req, res, next) {
 
     var userId = parseInt(req.params.id);
 
-    db.one('select * from users where id = $1', userId)
+    db.one('select * from users where user_id = $1', userId)
         .then(function (data) {
             res.status(200)
                 .json({
@@ -64,7 +56,7 @@ function createUser(req, res, next) {
 function updateUser(req, res, next) {
 
     db.none('update users set first_name=$1, last_name=$2,' +
-        'email=$3, user_name=$4, password=$5 where id=$6',
+        'email=$3, user_name=$4, password=$5 where user_id=$6',
         [req.body.first_name, req.body.last_name, req.body.email,
         req.body.user_name, req.body.password, req.params.id])
         .then(function() {
@@ -82,7 +74,7 @@ function updateUser(req, res, next) {
 function removeUser(req, res, next) {
 
     var userId = parseInt(req.params.id);
-    db.result('delete from users where id=$1', userId)
+    db.result('delete from users where user_id=$1', userId)
         .then(function () {
             res.status(200)
                 .json({

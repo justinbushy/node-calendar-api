@@ -1,17 +1,22 @@
 var express = require('express');
 var router = express.Router();
 
-var db = require('../user_queries');
+var user_db = require('../user_queries');
+var event_db = require('../event_queries');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/api/users', db.getAllUsers);
-router.get('/api/users/:id', db.getSingleUser);
-router.post('/api/users', db.createUser);
-router.put('/api/users/:id', db.updateUser);
-router.delete('/api/users/:id', db.removeUser);
+/* User routes */
+router.get('/api/users', user_db.getAllUsers);
+router.get('/api/users/:id', user_db.getSingleUser);
+router.post('/api/users', user_db.createUser);
+router.put('/api/users/:id', user_db.updateUser);
+router.delete('/api/users/:id', user_db.removeUser);
+
+/* Event routes */
+router.get('/api/events/:id', event_db.getAllEvents);
 
 module.exports = router;

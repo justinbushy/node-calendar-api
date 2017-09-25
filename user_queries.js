@@ -26,10 +26,39 @@ function getAllUsers(req, res, next) {
 
 function getSingleUser(req, res, next) {
 
+    var userId = parseInt(req.params.id);
+
+    db.one('select * from users where id = $1', userId)
+        .then(function (data) {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: data,
+                    message: 'retrieved one user'
+                });
+        })
+        .catch(function (err) {
+            return next(err);
+        });
 }
 
 function createUser(req, res, next) {
 
+    db.none('insert into users(first_name, last_name,' +
+        'email, user_name, password) ' +
+        'values(${first_name}, ${last_name}, ${email}, ' +
+        '${user_name}, ${password})',
+        req.body)
+        .then(function() {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    message: 'Created user'
+                });
+        })
+        .catch(function (err) {
+            return next(err);
+        });
 }
 
 function updateUser(req, res, next) {

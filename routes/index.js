@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-var user_db = require('../user_queries');
-var event_db = require('../event_queries');
+var user_db = require('../queries/user_queries');
+var event_db = require('../queries/event_queries');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

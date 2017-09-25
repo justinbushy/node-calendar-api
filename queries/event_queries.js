@@ -1,4 +1,4 @@
-var db = require('./pg_config');
+var db = require('../pg_config');
 
 function getAllEvents(req, res, next) {
 

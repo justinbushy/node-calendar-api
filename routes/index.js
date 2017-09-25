@@ -19,4 +19,6 @@ router.delete('/api/users/:id', user_db.removeUser);
 /* Event routes */
 router.get('/api/events/:id', event_db.getAllEvents);
 
+router.get('/api/events/:id/:date', event_db.getEventsOnDate);
+
 module.exports = router;

@@ -22,9 +22,11 @@ router.get('/api/users/:id/events/', event_db.getAllEvents);
 router.post('/api/users/:id/events/', event_db.creatEvent);
 router.get('/api/users/:id/events/:date', event_db.getEventsOnDate);
 router.get('/api/users/:id/events/:time', event_db.getEventsBetweenTime);
+router.delete('/api/users/:id/events/:event_id', event_db.removeEvent);
 
 /* Task routes */
 router.get('/api/users/:id/tasks', task_db.getAllTasks);
 router.post('/api/users/:id/tasks', task_db.createTask);
+router.delete('/api/users/:id/tasks/:task_id', task_db.removeTask);
 
 module.exports = router;

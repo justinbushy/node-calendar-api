@@ -35,8 +35,25 @@ function createTask(req, res, next) {
         });
 }
 
+function removeTask(req, res, next) {
+
+    var  taskId = parseInt(req.params.task_id);
+    db.none('delete from tasks where id=$1', taskId)
+        .then(function() {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    message: 'Removed task'
+                });
+        })
+        .catch(function (err) {
+            return next(err);
+        });
+}
+
 
 module.exports = {
     getAllTasks: getAllTasks,
-    createTask: createTask
+    createTask: createTask,
+    removeTask: removeTask
 }

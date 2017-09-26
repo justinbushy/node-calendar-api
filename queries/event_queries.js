@@ -66,6 +66,23 @@ function getEventsBetweenTime(req, res, next) {
 
 }
 
+function removeEvent(req, res, next) {
+
+    var eventId = parseInt(req.params.event_id);
+    db.result('delete from events where id=$1', eventId)
+        .then(function () {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    message: 'Removed event'
+                });
+        })
+        .catch(function (err) {
+            return next(err);
+        });
+
+}
+
 function parseURLDate(date) {
     //yyyy mm dd
     var year = date.substring(0,4);
@@ -86,5 +103,6 @@ module.exports = {
     getAllEvents: getAllEvents,
     getEventsOnDate: getEventsOnDate,
     getEventsBetweenTime: getEventsBetweenTime,
-    creatEvent: createEvent
+    creatEvent: createEvent,
+    removeEvent: removeEvent
 }

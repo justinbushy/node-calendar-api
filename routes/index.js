@@ -3,6 +3,7 @@ var router = express.Router();
 
 var user_db = require('../queries/user_queries');
 var event_db = require('../queries/event_queries');
+var task_db = require('../queries/task_queries');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -17,8 +18,13 @@ router.put('/api/users/:id', user_db.updateUser);
 router.delete('/api/users/:id', user_db.removeUser);
 
 /* Event routes */
-router.get('/api/events/:id', event_db.getAllEvents);
+router.get('/api/users/:id/events/', event_db.getAllEvents);
+router.post('/api/users/:id/events/', event_db.creatEvent);
+router.get('/api/users/:id/events/:date', event_db.getEventsOnDate);
+router.get('/api/users/:id/events/:time', event_db.getEventsBetweenTime);
 
-router.get('/api/events/:id/:date', event_db.getEventsOnDate);
+/* Task routes */
+router.get('/api/users/:id/tasks', task_db.getAllTasks);
+router.post('/api/users/:id/tasks', task_db.createTask);
 
 module.exports = router;

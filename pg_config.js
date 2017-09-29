@@ -5,7 +5,18 @@ var options = {
 }
 
 var pgp = require('pg-promise')(options);
-var connectionString = 'postgres://localhost:5432/calendar';
-var db = pgp(connectionString);
+
+//Used for AWS deployment
+/*var cn = {
+    host: process.env.RDS_HOSTNAME,
+    port: process.env.RDS_PORT,
+    database: 'calendar',
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD
+}*/
+
+//Used for local deployment
+var cn = 'postgres://localhost:5432/calendar';
+var db = pgp(cn);
 
 module.exports = db;

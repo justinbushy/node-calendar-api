@@ -32,5 +32,6 @@ router.delete('/api/users/:id/tasks/:task_id', task_db.removeTask);
 
 //testing mongo users
 router.get('/users', users.list_all_users);
+router.post('/users', users.create_user);
 
 module.exports = router;

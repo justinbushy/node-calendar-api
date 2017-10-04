@@ -1,11 +1,12 @@
 'use strict'
 
-module.exports = function(app) {
-    var user = require('../controllers/userController');
+var express = require('express');
+var router = express.Router();
 
-    app.route('/users')
-        .get(user.list_all_users)
-        .post(user.create_user);
+var users = require('../controllers/user_controller');
 
-   //add single user routes here later
-}
+/* THESE ROUTES START WITH /users */
+router.get('/', users.list_all_users);
+router.post('/', users.create_user);
+
+module.exports = router;

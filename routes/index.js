@@ -4,6 +4,7 @@ var router = express.Router();
 var user_db = require('../queries/user_queries');
 var event_db = require('../queries/event_queries');
 var task_db = require('../queries/task_queries');
+var users = require('../controllers/user_controller');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -28,5 +29,8 @@ router.delete('/api/users/:id/events/:event_id', event_db.removeEvent);
 router.get('/api/users/:id/tasks', task_db.getAllTasks);
 router.post('/api/users/:id/tasks', task_db.createTask);
 router.delete('/api/users/:id/tasks/:task_id', task_db.removeTask);
+
+//testing mongo users
+router.get('/users', users.list_all_users);
 
 module.exports = router;

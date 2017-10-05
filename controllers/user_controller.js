@@ -13,6 +13,14 @@ exports.list_all_users = function(req, res) {
     });
 };
 
+exports.list_one_users = function(req, res) {
+    User.findById(req.params.user_id, function(err, user) {
+        if(err)
+            res.send(err);
+        res.json(user);
+    });
+};
+
 exports.create_user = function(req, res) {
     var new_user = new User(req.body);
     new_user.save(function(err, user) {
@@ -21,4 +29,5 @@ exports.create_user = function(req, res) {
         res.json(user);
     });
 };
+
 

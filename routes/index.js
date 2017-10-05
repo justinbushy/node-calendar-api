@@ -12,11 +12,13 @@ router.get('/', function(req, res, next) {
 });
 
 /* User routes */
+/*
 router.get('/api/users', user_db.getAllUsers);
 router.get('/api/users/:id', user_db.getSingleUser);
 router.post('/api/users', user_db.createUser);
 router.put('/api/users/:id', user_db.updateUser);
 router.delete('/api/users/:id', user_db.removeUser);
+*/
 
 /* Event routes */
 router.get('/api/users/:id/events/', event_db.getAllEvents);

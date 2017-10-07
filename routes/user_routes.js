@@ -10,5 +10,6 @@ router.get('/users', users.list_all_users);
 router.post('/users', users.create_user);
 
 router.get('/users/:user_id', users.list_one_users);
+router.delete('/users/:user_id', users.remove_user);
 
 module.exports = router;

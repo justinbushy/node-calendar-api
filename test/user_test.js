@@ -128,4 +128,27 @@ describe('Users', function() {
         });
     });
 
+    describe('DELETE /api/users/:id', function() {
+        it('it should DELETE a user with the given id', function(done){
+
+            var new_user = {
+                first_name: 'Chelsey',
+                last_name: 'Bush',
+                email: 'cbush@gmail.com',
+                user_name: 'cbush',
+                password: 'letmein'
+            };
+            var delete_user = new User(new_user);
+            delete_user.save(function(err, user){
+                chai.request(app)
+                    .delete('/api/users/' + delete_user._id)
+                    .end(function(err, res) {
+                        res.should.have.status(200);
+                        done();
+                    })
+            })
+
+        })
+    })
+
 });

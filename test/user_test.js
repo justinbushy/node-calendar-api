@@ -7,7 +7,7 @@ var app = require('../app.js');
 var should = chai.should();
 
 var mongoose = require('mongoose');
-var User = require('../models/userModel');
+var User = require('../models/user_model');
 
 chai.use(chaiHTTP);
 
@@ -49,26 +49,22 @@ describe('Users', function() {
 
     });
 
-
-    describe('Users', function () {
-
-        describe('/GET users', function () {
-            it('it should GET a list of all users', function (done) {
-                chai.request(app)
-                    .get('/api/users')
-                    .end(function (err, res) {
-                        res.should.have.status(200);
-                        res.body.should.have.property('data');
-                        res.body.data[0].should.have.property('_id');
-                        res.body.data[0].should.have.property('first_name');
-                        res.body.data[0].should.have.property('last_name');
-                        res.body.data[0].should.have.property('email');
-                        res.body.data[0].should.have.property('user_name');
-                        res.body.data[0].should.have.property('password');
-                        res.body.data.should.have.lengthOf(2);
-                        done();
-                    });
-            });
+    describe('/GET users', function () {
+        it('it should GET a list of all users', function (done) {
+            chai.request(app)
+                .get('/api/users')
+                .end(function (err, res) {
+                    res.should.have.status(200);
+                    res.body.should.have.property('data');
+                    res.body.data[0].should.have.property('_id');
+                    res.body.data[0].should.have.property('first_name');
+                    res.body.data[0].should.have.property('last_name');
+                    res.body.data[0].should.have.property('email');
+                    res.body.data[0].should.have.property('user_name');
+                    res.body.data[0].should.have.property('password');
+                    res.body.data.should.have.lengthOf(2);
+                    done();
+                });
         });
     });
 
@@ -106,25 +102,22 @@ describe('Users', function() {
         });
     });
 
-    describe('Users', function () {
-
-        var new_user = {
-            first_name: 'Chelsey',
-            last_name: 'Bush',
-            email: 'cbush@gmail.com',
-            user_name: 'cbush',
-            password: 'letmein'
-        }
-        describe('/POST users', function () {
-            it('it should POST and create new user', function (done) {
-                chai.request(app)
-                    .post('/api/users')
-                    .send(new_user)
-                    .end(function (err, res) {
-                        res.should.have.status(200);
-                        done();
-                    });
-            });
+    describe('/POST users', function () {
+        it('it should POST and create new user', function (done) {
+            var new_user = {
+                first_name: 'Chelsey',
+                last_name: 'Bush',
+                email: 'cbush@gmail.com',
+                user_name: 'cbush',
+                password: 'letmein'
+            };
+            chai.request(app)
+                .post('/api/users')
+                .send(new_user)
+                .end(function (err, res) {
+                    res.should.have.status(200);
+                    done();
+                });
         });
     });
 
@@ -145,10 +138,10 @@ describe('Users', function() {
                     .end(function(err, res) {
                         res.should.have.status(200);
                         done();
-                    })
-            })
+                    });
+            });
 
-        })
-    })
+        });
+    });
 
 });

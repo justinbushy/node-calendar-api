@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose');
 
-var user_mod = require('../models/userModel');
+var user_mod = require('../models/user_model');
 var User = mongoose.model('User');
 
 function list_all_users(req, res) {

@@ -59,6 +59,18 @@ function remove_user(req, res) {
 
 function update_user(req, res) {
 
+    User.findById({_id: req.params.user_id}, function(err, user) {
+        if(err)
+            res.send(err);
+        Object.assign(user, req.body).save(function(err, user) {
+            if(err)
+                res.send(err);
+            res.json({
+                status: 'success',
+                message: 'User updated'
+            });
+        });
+    });
 }
 
 module.exports = {

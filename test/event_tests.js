@@ -120,4 +120,43 @@ describe('Events', function() {
 
         });
     });
+
+    describe('UPDATE events', function() {
+        it('it should UPDATE an event with given id', function(done) {
+            var event_1 = {
+                user_id: '1111',
+                title: 'Bart Day Care',
+                description: 'Drop Bart off with Sandy',
+                start_time: '2017-10-09T12:00:00.000Z',
+                end_time: '2017-10-09T18:00:00.000Z',
+                notes: ''
+            };
+
+            var update_event = {
+                user_id: '1111',
+                title: 'Bart Day Care',
+                description: 'Drop Bart off with Sandy',
+                start_time: '2017-10-09T12:00:00.000Z',
+                end_time: '2017-10-09T20:00:00.000Z',
+                notes: ''
+            };
+
+            var new_event = new Event(event_1);
+
+            new_event.save(function(err, event){
+                if(err)
+                    console.log(err);
+                chai.request(app)
+                    .put('/api/users/' + event.user_id + '/events/' + event._id)
+                    .send(update_event)
+                    .end(function(err, res) {
+                        res.should.have.status(200);
+                        res.body.should.have.property('message').eql('Event updated');
+                        done();
+                    });
+            });
+        });
+
+
+    });
 });

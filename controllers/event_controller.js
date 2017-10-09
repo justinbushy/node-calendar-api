@@ -51,7 +51,18 @@ function remove_event(req, res) {
 }
 
 function update_event(req, res) {
-
+    Event.findById({_id: req.params.event_id}, function(err, event){
+        if(err)
+            res.send(err);
+        Object.assign(event, req.body).save(function(err, event) {
+            if(err)
+                res.send(err);
+            res.json({
+                status: 'success',
+                message: 'Event updated'
+            });
+        });
+    });
 }
 
 module.exports = {

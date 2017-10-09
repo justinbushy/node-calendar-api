@@ -144,4 +144,39 @@ describe('Users', function() {
         });
     });
 
+    describe('UPDATE /api/users/:id', function() {
+        it('it should UPDATE a user with given id', function(done) {
+            var user_1 = {
+                first_name: 'Chelsey',
+                last_name: 'Bush',
+                email: 'cbush@gmail.com',
+                user_name: 'cbush',
+                password: 'letmein'
+            };
+
+
+            var update_user = {
+                first_name: 'Chelsey',
+                last_name: 'Bush',
+                email: 'cbush@gmail.com',
+                user_name: 'cbush',
+                password: 'letmein2'
+            };
+            var new_user =  new User(user_1);
+
+            new_user.save(function(err, user) {
+                if(err)
+                    console.log(err);
+                chai.request(app)
+                    .put('/api/users/' + user._id)
+                    .send(update_user)
+                    .end(function(err, res) {
+                        res.should.have.status(200);
+                        res.body.should.have.property('message').eql('User updated');
+                        done();
+                    });
+            });
+        });
+    });
+
 });

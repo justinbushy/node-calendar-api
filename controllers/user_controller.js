@@ -45,9 +45,11 @@ function create_user(req, res) {
 };
 
 function remove_user(req, res) {
-
-    var user_id = parseInt(req.params.user_id);
-    User.remove({_id: user_id}, function(err, result) {
+    User.remove({_id: req.params.user_id}, function(err, result) {
+        if(err) {
+            console.log(err);
+            return err;
+        }
         res.json({
             status: 'success',
             message: 'User removed'
@@ -55,11 +57,16 @@ function remove_user(req, res) {
     });
 };
 
+function update_user(req, res) {
+
+}
+
 module.exports = {
     list_all_users: list_all_users,
     list_one_users: list_one_users,
     create_user: create_user,
-    remove_user: remove_user
+    remove_user: remove_user,
+    update_user: update_user
 }
 
 

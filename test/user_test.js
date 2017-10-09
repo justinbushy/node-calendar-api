@@ -134,7 +134,7 @@ describe('Users', function() {
             var delete_user = new User(new_user);
             delete_user.save(function(err, user){
                 chai.request(app)
-                    .delete('/api/users/' + delete_user._id)
+                    .delete('/api/users/' + user._id)
                     .end(function(err, res) {
                         res.should.have.status(200);
                         done();

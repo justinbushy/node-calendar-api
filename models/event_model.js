@@ -15,7 +15,11 @@ var EventSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    end_time: Date
+    end_time: {
+        type: Date,
+        default: Date.now
+    },
+    notes: String
 });
 
 module.exports = mongoose.model('Event', EventSchema);

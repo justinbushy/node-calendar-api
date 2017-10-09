@@ -16,7 +16,7 @@ function list_all_events(req, res) {
                 message: 'Retrieved all events for user'
             });
     });
-};
+}
 
 function create_event(req, res) {
     var new_event = new Event(req.body);
@@ -29,9 +29,36 @@ function create_event(req, res) {
                 message: 'Event created'
             });
     });
-};
+}
+
+function list_one_event(req, res) {
+
+}
+
+function list_events_by_date(req, res) {
+
+}
+
+function remove_event(req, res) {
+    Event.remove({_id: req.params.event_id}, function(err, result) {
+        if(err)
+            return err;
+        res.json({
+            status: 'success',
+            message: 'Event removed'
+        });
+    });
+}
+
+function update_event(req, res) {
+
+}
 
 module.exports = {
     list_all_events: list_all_events,
-    create_event: create_event
+    create_event: create_event,
+    list_one_event: list_one_event,
+    list_events_by_date: list_events_by_date,
+    remove_event: remove_event,
+    update_event: update_event
 };

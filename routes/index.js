@@ -30,9 +30,11 @@ router.delete('/api/users/:id/events/:event_id', event_db.removeEvent);
 */
 
 /* Task routes */
+/*
 router.get('/api/users/:id/tasks', task_db.getAllTasks);
 router.post('/api/users/:id/tasks', task_db.createTask);
 router.delete('/api/users/:id/tasks/:task_id', task_db.removeTask);
+*/
 
 //testing mongo users
 /*

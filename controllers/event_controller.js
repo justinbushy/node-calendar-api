@@ -43,7 +43,8 @@ function remove_event(req, res) {
     Event.remove({_id: req.params.event_id}, function(err, result) {
         if(err)
             return err;
-        res.json({
+        res.status(200)
+            .json({
             status: 'success',
             message: 'Event removed'
         });
@@ -57,7 +58,8 @@ function update_event(req, res) {
         Object.assign(event, req.body).save(function(err, event) {
             if(err)
                 res.send(err);
-            res.json({
+            res.status(200)
+                .json({
                 status: 'success',
                 message: 'Event updated'
             });

@@ -1,10 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-var user_db = require('../queries/user_queries');
-var event_db = require('../queries/event_queries');
-var task_db = require('../queries/task_queries');
-var users = require('../controllers/user_controller');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

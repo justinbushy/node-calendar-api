@@ -8,7 +8,6 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
 var index = require('./routes/index');
-//var users = require('./routes/users');
 var user_routes = require('./routes/user_routes');
 var events_routes = require('./routes/event_routes');
 var task_routes = require('./routes/task_routes');
@@ -31,11 +30,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Routes
 app.use('/', index);
-//app.use('/users', users);
 app.use('/api', user_routes);
 app.use('/api', events_routes);
 app.use('/api', task_routes);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

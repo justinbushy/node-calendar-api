@@ -11,6 +11,7 @@ var index = require('./routes/index');
 var user_routes = require('./routes/user_routes');
 var events_routes = require('./routes/event_routes');
 var task_routes = require('./routes/task_routes');
+var pending_routes = require('./routes/pending_routes');
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use('/', index);
 app.use('/api', user_routes);
 app.use('/api', events_routes);
 app.use('/api', task_routes);
+app.use('/api', pending_routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

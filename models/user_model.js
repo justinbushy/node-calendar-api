@@ -24,7 +24,8 @@ var UserSchema = new Schema({
     password: {
         type: String,
         required: 'Please enter password'
-    }
+    },
+    friends: [String]
 });
 
 module.exports = mongoose.model('User', UserSchema);

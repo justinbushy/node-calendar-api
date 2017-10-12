@@ -5,10 +5,10 @@ var Schema = mongoose.Schema;
 
 var EventSchema = new Schema({
 
-    user_id: {
+    user_id: [{
         type: String,
         required: 'User ID is needed'
-    },
+    }],
     title: String,
     description: String,
     start_time: {

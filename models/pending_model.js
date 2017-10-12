@@ -9,7 +9,8 @@ var PendingSchema = new Schema({
         type: String,
         required: 'User ID is required'
     },
-    pending: [String]
+    pending_events: [String],
+    pending_friends: [String]
 });
 
 module.exports = mongoose.model('Pending', PendingSchema);

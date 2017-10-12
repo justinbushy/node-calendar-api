@@ -2,83 +2,156 @@
 
 var mongoose = require('mongoose');
 
+//Pending mongoose model
 var pending_model = require('../models/pending_model');
 var Pending = mongoose.model('Pending');
 
+//Event mongoose model
+var event_model = require('../models/event_model');
+var Event = mongoose.model('Event');
+
+//User mongoose model
+var user_model = require('../models/user_model');
+var User = mongoose.model('User');
+
 function list_all_pending_events(req, res) {
-    Pending.find({user_id: req.params.user_id}, function(err, events) {
+    Pending.findOne({user_id: req.params.user_id}, function(err, events) {
+        if(err)
+            res.send(err);
+        else {
+            res.status(200)
+                .json({
+                    status: 'success',
+                    data: events.pending_events,
+                    message: 'Retrieved all pending events for user'
+                });
+        }
+    });
+}
+
+function list_all_pending_friends(req, res) {
+    Pending.findOne({user_id: req.params.user_id}, function(err, friends) {
         if(err)
             res.send(err);
         res.status(200)
             .json({
                 status: 'success',
-                data: events,
-                message: 'Retrieved all pending events for user'
+                data: friends.pending_friends,
+                message: 'Retrieved all pending friends for user'
             });
     });
 }
 
 function add_to_pending_events(req, res) {
 
-    Pending.find({user_id: req.body.user_id}, function(err, pends) {
-        if(pends.length){
-            //already exists, update document
-            var pending_doc = pends[0];
-            pending_doc.pending.push(req.body.pending);
-            pending_doc.save(function(err){
-                if(err)
-                    console.log(err);
-                else{
-                    res.status(200)
-                        .json({
-                            status: 'success',
-                            message: 'Added event to users pending events'
-                        })
-                }
-            });
-            /*
-            Pending.update(
-                {user_id: req.body.user_id},
-                {$push: { pending: req.body.pending }},
-                function(err, event) {
-                    if(err)
-                        console.log(err);
-                    else
-                        res.status(200)
-                            .json({
-                                status: 'success',
-                                message: 'Added event to users pending events'
-                            });
-                }
-
-            );
-            */
-        }
-        else {
-            //Does not exist, create new one
-            var pend = {
-                user_id: req.body.user_id,
-                pending: req.body.pending
-            };
-
-            console.log('pend: ' +pend);
-
-            var new_pending = new Pending(pend);
-
-            new_pending.save(function(err) {
-                if(err)
-                    res.send(err)
+    //TODO: need to check that other user_id is in friends list
+    Pending.findOneAndUpdate(
+        { user_id: req.body.user_id},
+        {$push: { pending_events: req.body.pending_events}},
+        {upsert: true},
+        function(err) {
+            if(err)
+                console.log(err);
+            else {
                 res.status(200)
                     .json({
                         status: 'success',
                         message: 'Added event to users pending events'
                     });
-            });
-        }
-    });
+            }
+        });
+
+}
+
+function add_to_pending_friends(req, res) {
+
+    Pending.findOneAndUpdate(
+        {user_id: req.body.user_id},
+        {$push: {pending_friends: req.params.user_id}},
+        {upsert: true},
+        function(err) {
+            if(err)
+                console.log(err);
+            else {
+                res.status(200)
+                    .json({
+                        status: 'success',
+                        message: 'Added friend to users pending friends'
+                    });
+            }
+        });
+}
+
+function accept_pending_event(req, res) {
+
+    //find and update pending events for user
+    Pending.findOneAndUpdate({user_id: req.params.user_id},
+        {$pull: {pending_events: req.body.event_id}},
+        function(err) {
+            if(err)
+                console.log(err);
+            else {
+
+                //find and update event to include this user_id
+                Event.findOneAndUpdate({_id: req.body.event_id},
+                    {$push: {user_id: req.params.user_id}},
+                    function(err, doc) {
+
+                        console.log('doc: ' + doc);
+                        if(err)
+                            console.log(err);
+                        else {
+                            res.status(200)
+                                .json({
+                                    status: 'success',
+                                    message: 'Accepted event from pending events'
+                                });
+                        }
+                    });
+            }
+        });
+}
+
+function accept_pending_friend(req, res) {
+
+    Pending.findOneAndUpdate({user_id: req.params.user_id},
+        {$pull: {pending_friends: req.body.user_id}},
+        function(err) {
+            if(err)
+                console.log(err);
+            else {
+                //add other user to requesting users friends list
+                User.findOneAndUpdate({_id: req.params.user_id},
+                    {$push: {friends: req.body.user_id}},
+                    function(err) {
+                        if(err)
+                            console.log(err)
+                        else {
+                            //add requesting user to other users friends list
+                            User.findOneAndUpdate({_id: req.body.user_id},
+                                {$push: {friends: req.params.user_id}},
+                                function(err) {
+                                    if(err)
+                                        console.log(err);
+                                    else {
+                                        res.status(200)
+                                            .json({
+                                                status: 'success',
+                                                message: 'Friend is accepted'
+                                            });
+                                    }
+                                });
+                        }
+                    });
+            }
+        });
 }
 
 module.exports = {
     list_all_pending_event: list_all_pending_events,
-    add_to_pending_events: add_to_pending_events
+    list_all_pending_friends: list_all_pending_friends,
+    add_to_pending_events: add_to_pending_events,
+    add_to_pending_friends: add_to_pending_friends,
+    accept_pending_event: accept_pending_event,
+    accept_pending_friend: accept_pending_friend
 };

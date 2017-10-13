@@ -82,7 +82,6 @@ function acceptPendingEvent (req, res) {
         Event.findOneAndUpdate({ _id: req.body.event_id },
           { $push: { user_id: req.params.user_id } },
           function (err, doc) {
-            console.log('doc: ' + doc);
             if (err) { console.log(err); } else {
               res.status(200)
                 .json({

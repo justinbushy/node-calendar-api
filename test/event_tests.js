@@ -54,8 +54,6 @@ describe('Events', function () {
           .end(function (err, res) {
             if (err) return err;
 
-            console.log(res.status);
-
             res.should.have.status(200);
             res.body.data[0].should.have.property('_id').eql('' + newEvent._id);
             res.body.data[0].should.have.property('title').eql('' + event1.title);

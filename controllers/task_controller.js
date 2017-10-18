@@ -5,6 +5,14 @@ var mongoose = require('mongoose');
 var task_model = require('../models/task_model'); //eslint-disable-line
 var Task = mongoose.model('Task');
 
+/**
+ * Route handler for 'GET /api/users/:user_id/tasks'
+ *
+ * Retrieves all tasks for user and sends list back to client
+ *
+ * @param req
+ * @param res
+ */
 function listAllTasks (req, res) {
   Task.find({user_id: req.params.user_id}, function (err, tasks) {
     if (err) { res.send(err); }
@@ -17,10 +25,33 @@ function listAllTasks (req, res) {
   });
 }
 
+/**
+ * Will list all tasks for user by given date
+ *
+ * @param req
+ * @param res
+ */
 function listTasksByDate (req, res) {
-  res.send();
+  // TODO
 }
 
+/**
+ * Route handler for 'POST /api/users/:user_id/tasks'
+ *
+ * Creates task for user with the given data from client
+ *
+ * Expected body format from client:
+ * {
+ *    user_id: String (required),
+ *    title: String (required),
+ *    description: String,
+ *    task_date: String (format: yyy-mm-ddThh:mm:ss.000Z required),
+ *    completed: Boolean (required)
+ * }
+ *
+ * @param req
+ * @param res
+ */
 function createTask (req, res) {
   var newTask = new Task(req.body);
   newTask.save(function (err, event) {
@@ -34,6 +65,14 @@ function createTask (req, res) {
   });
 }
 
+/**
+ * Route handler for 'DELETE /api/users/:user_id/tasks/:task_id'
+ *
+ * Removes the task from the database.
+ *
+ * @param req
+ * @param res
+ */
 function removeTask (req, res) {
   Task.remove({_id: req.params.task_id}, function (err, result) {
     if (err) { res.send(err); }
@@ -45,6 +84,23 @@ function removeTask (req, res) {
   });
 }
 
+/**
+ * Route handler for 'PUT /api/users/:user_id/tasks/:task_id'
+ *
+ * Updates the task with the data from the client
+ *
+ * Expected body format from client:
+ * {
+ *    user_id: String,
+ *    title: String,
+ *    description: String,
+ *    task_date: String (format: yyy-mm-ddThh:mm:ss.000Z),
+ *    completed: Boolean
+ * }
+ *
+ * @param req
+ * @param res
+ */
 function updateTask (req, res) {
   Task.findById({_id: req.params.task_id}, function (err, task) {
     if (err) { res.send(err); }

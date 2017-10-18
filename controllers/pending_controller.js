@@ -14,6 +14,15 @@ var Event = mongoose.model('Event');
 var user_model = require('../models/user_model'); //eslint-disable-line
 var User = mongoose.model('User');
 
+/**
+ * Route handler for 'GET /api/users/:user_id/pending/events'
+ *
+ * Retrieves all the of the pending events for user_id from the database,
+ * Then sends the list of pending events to the client
+ *
+ * @param req
+ * @param res
+ */
 function listAllPendingEvents (req, res) {
   Pending.findOne({ user_id: req.params.user_id }, function (err, events) {
     if (err) { res.send(err); } else {
@@ -27,6 +36,15 @@ function listAllPendingEvents (req, res) {
   });
 }
 
+/**
+ * Route handler for 'GET /api/users/:user_id/pending/friends'
+ *
+ * Retrieves all of the pending friends for the user_id from the database
+ * Then sends the list of pending friends to the client
+ *
+ * @param req
+ * @param res
+ */
 function listAllPendingFriends (req, res) {
   Pending.findOne({ user_id: req.params.user_id }, function (err, friends) {
     if (err) { res.send(err); }
@@ -39,6 +57,22 @@ function listAllPendingFriends (req, res) {
   });
 }
 
+/**
+ * Route handler for 'POST /api/users/:user_id/events/share'
+ *
+ * Adds the event_id to the other users list of pending events
+ *
+ * Expected body format from client:
+ * {
+ *    user_id: String,
+ *    pending_events: [String]
+ * }
+ *
+ * NOTE: the user can share multiple events at a time
+ *
+ * @param req
+ * @param res
+ */
 function addToPendingEvents (req, res) {
   // TODO: need to check that other user_id is in friends list
   Pending.findOneAndUpdate(
@@ -56,6 +90,19 @@ function addToPendingEvents (req, res) {
     });
 }
 
+/**
+ * Route handler for 'POST /api/users/:user_id/friends'
+ *
+ * Adds user_id to other users pending friends list
+ *
+ * Expected body format from client:
+ * {
+ *    user_id: String
+ * }
+ *
+ * @param req
+ * @param res
+ */
 function addToPendingFriends (req, res) {
   Pending.findOneAndUpdate(
     { user_id: req.body.user_id },
@@ -72,6 +119,20 @@ function addToPendingFriends (req, res) {
     });
 }
 
+/**
+ * Route handler for 'PUT /api/users/:user_id/events'
+ *
+ * Accepts the event_id from the pending event list as an event.
+ * Removes the event_id from the pending list and adds user_id to event's users.
+ *
+ * Expected body format from client:
+ * {
+ *    event_id: String
+ * }
+ *
+ * @param req
+ * @param res
+ */
 function acceptPendingEvent (req, res) {
   // find and update pending events for user
   Pending.findOneAndUpdate({ user_id: req.params.user_id },
@@ -94,6 +155,22 @@ function acceptPendingEvent (req, res) {
     });
 }
 
+/**
+ * Route handler for 'PUT /api/users/:user_id/friends'
+ *
+ * Accepts the user_id (from body) as a friend.
+ * Removes the user_id (from body) from pending friends list and adds to users friends
+ *
+ * Expected body format from client:
+ * {
+ *    user_id: String
+ * }
+ *
+ * NOTE: users friends list is found in User model
+ *
+ * @param req
+ * @param res
+ */
 function acceptPendingFriend (req, res) {
   Pending.findOneAndUpdate({ user_id: req.params.user_id },
     { $pull: { pending_friends: req.body.user_id } },

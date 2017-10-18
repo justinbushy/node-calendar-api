@@ -7,9 +7,12 @@ var EventSchema = new Schema({
 
   user_id: [{
     type: String,
-    required: 'User ID is needed'
+    required: 'User ID is required'
   }],
-  title: String,
+  title: {
+    type: String,
+    required: 'Title is required$'
+  },
   description: String,
   start_time: {
     type: Date,

@@ -99,6 +99,7 @@ describe('Tasks', function () {
         task_date: '2017-10-09T00:00:00.000Z',
         completed: false
       };
+
       var newTask = new Task(task1);
 
       newTask.save(function (err, task) {

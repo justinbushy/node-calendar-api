@@ -115,18 +115,24 @@ function removeEvent (req, res) {
  */
 function updateEvent (req, res) {
   // TODO: validate client input
-  // Consider using Mongoose's findOneAndUpdate method
-  Event.findById({ _id: req.params.event_id }, function (err, event) {
-    if (err) { res.send(err); }
-    Object.assign(event, req.body).save(function (err, event) {
-      if (err) { res.send(err); }
-      res.status(200)
-        .json({
-          status: 'success',
-          message: 'Event updated'
-        });
+  // Mongoose findOneAndUpdate takes conditions, update parameters, and options
+  var conditions = { _id: req.params.event_id };
+  var update = req.body;
+  var options = {
+    overwrite: true,
+    new: true
+  }; // need overwrite and new options set to true to overwrite parameters and return updated doc
+
+  Event.findOneAndUpdate(conditions, update, options,
+    function (err) {
+      if (err) { console.log(err); } else {
+        res.status(200)
+          .json({
+            status: 'success',
+            message: 'Event updated'
+          });
+      }
     });
-  });
 }
 
 module.exports = {

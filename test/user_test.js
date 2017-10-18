@@ -156,6 +156,7 @@ describe('Users', function () {
         password: 'letmein'
       };
 
+      /*
       var updateUser = {
         first_name: 'Chelsey',
         last_name: 'Bush',
@@ -163,6 +164,12 @@ describe('Users', function () {
         user_name: 'cbush',
         password: 'letmein2'
       };
+      */
+
+      var updateUser = {
+        password: 'letmein2'
+      };
+
       var newUser = new User(user1);
 
       newUser.save(function (err, user) {

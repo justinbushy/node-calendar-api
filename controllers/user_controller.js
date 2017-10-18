@@ -118,17 +118,24 @@ function removeUser (req, res) {
  * @param res
  */
 function updateUser (req, res) {
-  // Consider using Mongoose's findOneAndUpdate
-  User.findById({ _id: req.params.user_id }, function (err, user) {
-    if (err) { res.send(err); }
-    Object.assign(user, req.body).save(function (err, user) {
-      if (err) { res.send(err); }
-      res.json({
-        status: 'success',
-        message: 'User updated'
-      });
+  // Mongoose findOneAndUpdate takes conditions, update parameter, and options
+  var conditions = { _id: req.params.user_id };
+  var update = req.body;
+  var options = {
+    overwrite: true,
+    new: true
+  };
+
+  User.findOneAndUpdate(conditions, update, options,
+    function (err) {
+      if (err) { console.log(err); } else {
+        res.status(200)
+          .json({
+            status: 'success',
+            message: 'User updated'
+          });
+      }
     });
-  });
 }
 
 module.exports = {

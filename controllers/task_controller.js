@@ -102,18 +102,25 @@ function removeTask (req, res) {
  * @param res
  */
 function updateTask (req, res) {
-  Task.findById({_id: req.params.task_id}, function (err, task) {
-    if (err) { res.send(err); }
-    Object.assign(task, req.body).save(function (err, task) {
-      if (err) { res.send(err); }
-      res.status(200)
-        .json({
-          status: 'success',
-          data: task,
-          message: 'Task updated'
-        });
+  // Mongoose findOneAndUpdate takes conditions, update parameters, and options
+  var conditions = { _id: req.params.task_id };
+  var update = req.body;
+  var options = {
+    overwrite: true,
+    new: true
+  };
+
+  Task.findOneAndUpdate(conditions, update, options,
+    function (err, task) {
+      if (err) { console.log(err); } else {
+        res.status(200)
+          .json({
+            status: 'success',
+            data: task,
+            message: 'Task updated'
+          });
+      }
     });
-  });
 }
 
 module.exports = {

@@ -17,7 +17,7 @@ var app = express();
 
 // Mongoose connection
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/Calendardb');
+mongoose.connect('mongodb://localhost/Calendardb', { useMongoClient: true });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

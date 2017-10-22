@@ -138,10 +138,20 @@ function updateUser (req, res) {
     });
 }
 
+function login_required(req, res, next) {
+
+}
+
+function sign_in (req, res) {
+
+}
+
 module.exports = {
   list_all_users: listAllUsers,
   list_one_users: listOneUser,
   create_user: createUser,
   remove_user: removeUser,
-  update_user: updateUser
+  update_user: updateUser,
+  login_required: login_required,
+  sign_in: sign_in
 };

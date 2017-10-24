@@ -36,14 +36,22 @@ app.use(function (req, res, next) {
   if (req.headers && req.headers.authorization
     && req.headers.authorization.split(' ')[0] === 'JWT') {
     console.log('has auth header');
-    jsonwebtoken.verify(
-      req.headers.authorization.split(' ')[1],
-      'RESTFULAPIs',
-      function (err, decode) {
-        if (err) req.user = undefined;
-        req.user = decode;
-        next();
-      });
+    var decoded = jsonwebtoken.decode(req.headers.authorization.split(' ')[1]);
+    console.log(decoded);
+    if(decoded._id !== req.params.user_id){
+      req.user = undefined;
+      next();
+    }
+    else {
+      jsonwebtoken.verify(
+        req.headers.authorization.split(' ')[1],
+        'RESTFULAPIs',
+        function (err, decode) {
+          if (err) req.user = undefined;
+          req.user = decode;
+          next();
+        });
+    }
   }
   else {
     console.log('no auth header');

@@ -4,7 +4,7 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var jsonwebtoken = require('jsonwebtoken');
 var mongoose = require('mongoose');
 
 var index = require('./routes/index');
@@ -31,6 +31,27 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// JWT middleware
+app.use(function (req, res, next) {
+  if (req.headers && req.headers.authorization
+    && req.headers.authorization.split(' ')[0] === 'JWT') {
+    console.log('has auth header');
+    jsonwebtoken.verify(
+      req.headers.authorization.split(' ')[1],
+      'RESTFULAPIs',
+      function (err, decode) {
+        if (err) req.user = undefined;
+        req.user = decode;
+        next();
+      });
+  }
+  else {
+    console.log('no auth header');
+    req.user = undefined;
+    next();
+  }
+});
+
 // Routes
 app.use('/', index);
 app.use('/api', userRoutes);
@@ -55,5 +76,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 module.exports = app;

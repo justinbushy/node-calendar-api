@@ -1,6 +1,8 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
 
 var user_mod = require('../models/user_model'); //eslint-disable-line
 var User = mongoose.model('User');
@@ -58,7 +60,7 @@ function listOneUser (req, res) {
  *    last_name: String (required),
  *    email: String (required),
  *    user_name: String (required),
- *    password: String (required) NEEDS ENCRYPTION
+ *    password: String (required) ENCRYPTED BY BCRYPT
  * }
  *
  * @param req
@@ -66,7 +68,9 @@ function listOneUser (req, res) {
  */
 function createUser (req, res) {
   var newUser = new User(req.body);
-  newUser.save(function (err) {
+  var salt = bcrypt.genSaltSync(10);
+  newUser.password = bcrypt.hashSync(req.body.password, salt);
+  newUser.save(function (err, user) {
     if (err) { res.send(err); }
     res.status(200)
       .json({
@@ -139,11 +143,50 @@ function updateUser (req, res) {
 }
 
 function login_required(req, res, next) {
-
+  if(req.user) {
+    next();
+  }
+  else {
+    res.status(401)
+      .json({
+        status: 'unauthorized',
+        message: 'User unauthorized'
+      });
+  }
 }
 
 function sign_in (req, res) {
-
+  User.findOne({ email: req.body.email }, function (err, user) {
+    if (err) { console.log(err); }
+    if (!user) {
+      res.status(401)
+        .json({
+          message: 'User not found'
+        });
+    }
+    else if (user) {
+      if (!user.comparePasswords(req.body.password)) {
+        res.status(401)
+          .json({
+            message: 'Wrong password'
+          });
+      }
+      else {
+        res.status(200)
+          .json({
+            status: 'success',
+            token: jwt.sign({
+              email: user.email,
+              first_name: user.first_name,
+              last_name: user.last_name,
+              _id: user._id
+            }, 'RESTFULAPIs'),
+            user_id: user._id,
+            message: 'User Authenticated.'
+          });
+      }
+    }
+  });
 }
 
 module.exports = {

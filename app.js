@@ -17,7 +17,7 @@ var app = express();
 
 var secret = process.env.JWT_SECRET ||  '26073B5085EF60DC6FD0BD416D8DDE5F4B71CF222A21C4BF1CD31485273C06B8'
 // Mongoose connection
-var mongo_uri = process.env.MONGO_URI || 'mongodb://localhost/Calendardb';
+var mongo_uri = process.env.MONGODB_URI || 'mongodb://localhost/Calendardb';
 mongoose.Promise = global.Promise;
 mongoose.connect(mongo_uri, { useMongoClient: true });
 

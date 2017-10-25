@@ -7,6 +7,8 @@ var jwt = require('jsonwebtoken');
 var user_mod = require('../models/user_model'); //eslint-disable-line
 var User = mongoose.model('User');
 
+var secret = process.env.JWT_SECRET ||  '26073B5085EF60DC6FD0BD416D8DDE5F4B71CF222A21C4BF1CD31485273C06B8'
+
 /**
  * Route handler for 'GET /api/users'
  *
@@ -143,8 +145,21 @@ function updateUser (req, res) {
 }
 
 function login_required(req, res, next) {
+  // jwt is authenticated first by middleware
+  // If token is valid, then req.user is not undefined
   if(req.user) {
-    next();
+    // check that the token contains requesting user id .
+    var decoded = jwt.decode(req.headers.authorization.split(' ')[1]);
+    if(decoded._id !== req.params.user_id) {
+      res.status(401)
+        .json({
+          status: 'unauthorized',
+          message: 'User unauthorized'
+        });
+    }
+    else {
+      next();
+    }
   }
   else {
     res.status(401)
@@ -180,7 +195,7 @@ function sign_in (req, res) {
               first_name: user.first_name,
               last_name: user.last_name,
               _id: user._id
-            }, 'RESTFULAPIs'),
+            }, secret),
             user_id: user._id,
             message: 'User Authenticated.'
           });

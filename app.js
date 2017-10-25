@@ -15,6 +15,7 @@ var pendingRoutes = require('./routes/pending_routes');
 
 var app = express();
 
+var secret = process.env.JWT_SECRET ||  '26073B5085EF60DC6FD0BD416D8DDE5F4B71CF222A21C4BF1CD31485273C06B8'
 // Mongoose connection
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/Calendardb', { useMongoClient: true });
@@ -36,22 +37,14 @@ app.use(function (req, res, next) {
   if (req.headers && req.headers.authorization
     && req.headers.authorization.split(' ')[0] === 'JWT') {
     console.log('has auth header');
-    var decoded = jsonwebtoken.decode(req.headers.authorization.split(' ')[1]);
-    console.log(decoded);
-    if(decoded._id !== req.params.user_id){
-      req.user = undefined;
-      next();
-    }
-    else {
-      jsonwebtoken.verify(
-        req.headers.authorization.split(' ')[1],
-        'RESTFULAPIs',
-        function (err, decode) {
-          if (err) req.user = undefined;
-          req.user = decode;
-          next();
-        });
-    }
+    jsonwebtoken.verify(
+      req.headers.authorization.split(' ')[1],
+      secret,
+      function (err, decode) {
+        if (err) req.user = undefined;
+        req.user = decode;
+        next();
+      });
   }
   else {
     console.log('no auth header');

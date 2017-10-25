@@ -3,3 +3,32 @@ extends layout
 block content
   h1 CalendarAPI
   p Welcome to the api
+
+  h2 User Routes
+  p POST /api/users --> Register User
+  p POST /api/users/signin --> Sign in user
+  p PUT /api/users/:user_id --> Update user
+  p DELETE /api/users/:user_id --> Remove User
+
+  h2 Event Routes
+  p POST /api/users/:users_id/events --> Create Event for user
+  p GET /api/users/:user_id/events --> List all events for user
+  p GET /api/users/:user_id/events/:event_id --> List specific event
+  p PUT /api/users/:user_id/events/:event_id --> Update event
+  p DELETE /api/users/:user_id/events/:event_id --> Remove event
+
+  h2 Task Routes
+  p POST /api/users/:user_id/tasks --> Create task for user
+  p GET /api/users/:user_id/tasks --> List all tasks for user
+  p PUT /api/users/:user_id/tasks/:task_id --> Update task
+  p DELTE /api/users/:user_id/tasks/:task_id --> Remove task
+
+  h2 Pending Events Routes
+  p POST /api/users/:user_id/events/share--> Share event with another user
+  p GET /api/users/:user_id/pending/events --> List all pending events for user
+  p PUT /api/users/:user_id/pending/events --> Accept pending events
+
+  h2 Pending Friends Routes
+  p POST /api/users/:user_id/friends --> Ask to be friends with other user
+  p GET /api/users/:user_id/pending/friends --> List all pending friend requests
+  p PUT /api/users/:user_id/friends --> Accept pending friend request

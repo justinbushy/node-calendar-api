@@ -12,4 +12,6 @@ router.get('/users/:user_id/events/:event_id', users.login_required, events.list
 router.put('/users/:user_id/events/:event_id', users.login_required, events.update_event);
 router.delete('/users/:user_id/events/:event_id', users.login_required, events.remove_event);
 
+router.get('/users/:user_id/events/date/:event_date', users.login_required, events.list_events_by_date);
+
 module.exports = router;

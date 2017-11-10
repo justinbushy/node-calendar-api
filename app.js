@@ -13,7 +13,11 @@ var eventsRoutes = require('./routes/event_routes');
 var taskRoutes = require('./routes/task_routes');
 var pendingRoutes = require('./routes/pending_routes');
 
+var cors = require('cors');
+
 var app = express();
+
+app.use(cors());
 
 var secret = process.env.JWT_SECRET ||  '26073B5085EF60DC6FD0BD416D8DDE5F4B71CF222A21C4BF1CD31485273C06B8'
 // Mongoose connection
@@ -54,11 +58,13 @@ app.use(function (req, res, next) {
   }
 });
 
+/*
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+*/
 
 // Routes
 app.use('/', index);

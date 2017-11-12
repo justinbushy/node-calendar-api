@@ -11,4 +11,6 @@ router.post('/users/:user_id/tasks', user.login_required, tasks.create_task);
 router.put('/users/:user_id/tasks/:task_id', user.login_required, tasks.update_task);
 router.delete('/users/:user_id/tasks/:task_id', user.login_required, tasks.remove_task);
 
+router.get('/users/:user_id/tasks/date/:event_date', user.login_required, tasks.list_tasks_by_date);
+
 module.exports = router;

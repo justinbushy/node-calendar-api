@@ -5,6 +5,8 @@ var mongoose = require('mongoose');
 var task_model = require('../models/task_model'); //eslint-disable-line
 var Task = mongoose.model('Task');
 
+var moment = require('moment');
+
 /**
  * Route handler for 'GET /api/users/:user_id/tasks'
  *
@@ -32,7 +34,26 @@ function listAllTasks (req, res) {
  * @param res
  */
 function listTasksByDate (req, res) {
-  // TODO
+  var start_date = moment(req.params.event_date);
+  var next_date = start_date.clone().add(1, 'day');
+
+  Event.find({
+    user_id: req.params.user_id,
+    start_time: { '$gte': start_date.toDate(), '$lt': next_date.toDate()}
+  }, function(err, events) {
+    if(err) {
+      console.log(err);
+      res.send(err);
+    }
+    else {
+      res.status(200)
+        .json({
+          status: 'success',
+          data: events,
+          message: 'Retrieved all events for user on given date'
+        });
+    }
+    });
 }
 
 /**

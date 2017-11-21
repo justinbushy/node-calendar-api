@@ -8,7 +8,7 @@ var app = require('../app');
 var should = chai.should(); //eslint-disable-line
 var Pending = require('../models/pending_model');
 var Event = require('../models/event_model');
-// var User = require('../models/user_model');
+var User = require('../models/user_model');
 
 chai.use(chaiHTTP);
 
@@ -20,15 +20,46 @@ describe('Pending', function () {
 
   before(function (done) {
     var userLogin1 = {
+      first_name: 'Bob',
+      last_name: 'Smith',
       email: 'b@gmail.com',
+      user_name: 'bsmith',
       password: 'pass'
     };
 
     var userLogin2 = {
+      first_name: 'Steve',
+      last_name: 'Smith',
       email: 's@gmail.com',
+      user_name: 'ssmith',
       password: 'pass'
     };
 
+    User.remove({ user_name: { $in: [ userLogin1.user_name, userLogin2.user_name ] } },
+      function (err) {
+        if (err) return console.log(err);
+
+        chai.request(app)
+          .post('/api/users')
+          .send(userLogin1)
+          .end(function (err, res) {
+            if (err) return console.log(err);
+
+            user1ID = res.body.user_id;
+            authTok1 = 'JWT ' + res.body.token;
+            chai.request(app)
+              .post('/api/users')
+              .send(userLogin2)
+              .end(function (err, res) {
+                if (err) return console.log(err);
+
+                user2ID = res.body.user_id;
+                authTok2 = 'JWT ' + res.body.token;
+                done();
+              });
+          });
+      });
+   /*
     chai.request(app)
       .post('/api/users/signin')
       .send(userLogin1)
@@ -49,7 +80,7 @@ describe('Pending', function () {
 
             done();
           });
-      });
+      }); */
   });
 
   beforeEach(function (done) {

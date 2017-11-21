@@ -17,20 +17,28 @@ describe('Events', function () {
   var authTok = '';
   before(function (done) {
     var userLogin = {
+      first_name: 'Bob',
+      last_name: 'Smith',
       email: 'b@gmail.com',
+      user_name: 'bsmith',
       password: 'pass'
     };
 
-    chai.request(app)
-      .post('/api/users/signin')
-      .send(userLogin)
-      .end(function (err, res) {
-        if (err) console.log(err);
+    User.remove({ email: userLogin.email }, function (err) {
+      if (err) return err;
 
-        userID = res.body.user_id;
-        authTok = 'JWT ' + res.body.token;
-        done();
-      });
+      chai.request(app)
+        .post('/api/users')
+        .send(userLogin)
+        .end(function (err, res) {
+          if (err) return console.log(err);
+          else {
+            userID = res.body.user_id;
+            authTok = 'JWT ' + res.body.token;
+            done();
+          }
+        });
+    });
   });
 
   beforeEach(function (done) {

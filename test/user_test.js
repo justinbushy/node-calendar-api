@@ -12,6 +12,9 @@ var User = require('../models/user_model');
 chai.use(chaiHTTP);
 
 describe('Users', function () {
+  var user1ID = '';
+  var authTok1 = '';
+
   beforeEach(function (done) {
     var user1 = {
       first_name: 'Justin',
@@ -21,32 +24,32 @@ describe('Users', function () {
       password: 'letmein'
     };
 
-    var user2 = {
-      first_name: 'Bart',
-      last_name: 'Bush',
-      email: 'blackbart@gmail.com',
-      user_name: 'blackbart',
-      password: 'bones'
+    // var newUser1 = new User(user1);
+    // var userList = [ user1.user_name ];
+    // var user1login = { email: user1.email, password: user1.password };
 
-    };
+    User.remove({ email: user1.email }, function (err) {
+      if (err) return err;
 
-    var newUser1 = new User(user1);
-    var newUser2 = new User(user2);
-
-    User.remove({}, function (err) {
-      if (err) { return err; }
-    }).then(newUser1.save(function (err) {
-      if (err) { return err; }
-    })).then(newUser2.save(function (err) {
-      if (err) { return err; }
-      done();
-    }));
+      chai.request(app)
+        .post('/api/users')
+        .send(user1)
+        .end(function (err, res) {
+          if (err) return console.log(err);
+          else {
+            user1ID = res.body.user_id;
+            authTok1 = 'JWT ' + res.body.token;
+            done();
+          }
+        });
+    });
   });
 
   describe('/GET users', function () {
     it('it should GET a list of all users', function (done) {
       chai.request(app)
         .get('/api/users')
+        .set('Authorization', authTok1)
         .end(function (err, res) {
           if (err) return err;
 
@@ -58,7 +61,6 @@ describe('Users', function () {
           res.body.data[0].should.have.property('email');
           res.body.data[0].should.have.property('user_name');
           res.body.data[0].should.have.property('password');
-          res.body.data.should.have.lengthOf(2);
           done();
         });
     });
@@ -66,38 +68,18 @@ describe('Users', function () {
 
   describe('GET /api/users/:user_id', function () {
     it('it should GET 1 user by the given id', function (done) {
-      var newUser = {
-        first_name: 'Nala',
-        last_name: 'Bush',
-        email: 'furrynala@gmail.com',
-        user_name: 'babynala',
-        password: 'scratch'
-      };
+      chai.request(app)
+        .get('/api/users/' + user1ID)
+        .set('Authorization', authTok1)
+        .end(function (err, res) {
+          if (err) return err;
 
-      var insertUser = new User(newUser);
-
-      insertUser.save(function (err, user) {
-        if (err) return err;
-
-        chai.request(app)
-          .get('/api/users/' + user._id)
-          .send(insertUser)
-          .end(function (err, res) {
-            if (err) return err;
-
-            res.should.have.status(200);
-            res.body.should.have.property('data');
-            res.body.should.have.property('status');
-            res.body.should.have.property('message');
-            res.body.data.should.have.property('_id').eql('' + insertUser._id);
-            res.body.data.should.have.property('first_name').eql('' + insertUser.first_name);
-            res.body.data.should.have.property('last_name').eql('' + insertUser.last_name);
-            res.body.data.should.have.property('email').eql('' + insertUser.email);
-            res.body.data.should.have.property('user_name').eql('' + insertUser.user_name);
-            res.body.data.should.have.property('password').eql('' + insertUser.password);
-            done();
-          });
-      });
+          res.should.have.status(200);
+          res.body.should.have.property('data');
+          res.body.should.have.property('status');
+          res.body.data.should.have.property('_id').eql('' + user1ID);
+          done();
+        });
     });
   });
 
@@ -110,9 +92,27 @@ describe('Users', function () {
         user_name: 'cbush',
         password: 'letmein'
       };
+      User.remove({ user_name: 'cbush' }, function (err) {
+        if (err) return err;
+
+        chai.request(app)
+          .post('/api/users')
+          .send(newUser)
+          .end(function (err, res) {
+            if (err) return err;
+
+            res.should.have.status(200);
+            done();
+          });
+      });
+    });
+  });
+
+  describe('DELETE /api/users/:id', function () {
+    it('it should DELETE a user with the given id', function (done) {
       chai.request(app)
-        .post('/api/users')
-        .send(newUser)
+        .delete('/api/users/' + user1ID)
+        .set('Authorization', authTok1)
         .end(function (err, res) {
           if (err) return err;
 
@@ -122,69 +122,25 @@ describe('Users', function () {
     });
   });
 
-  describe('DELETE /api/users/:id', function () {
-    it('it should DELETE a user with the given id', function (done) {
-      var newUser = {
-        first_name: 'Chelsey',
-        last_name: 'Bush',
-        email: 'cbush@gmail.com',
-        user_name: 'cbush',
-        password: 'letmein'
-      };
-      var deleteUser = new User(newUser);
-      deleteUser.save(function (err, user) {
-        if (err) return err;
-
-        chai.request(app)
-          .delete('/api/users/' + user._id)
-          .end(function (err, res) {
-            if (err) { return err; }
-            res.should.have.status(200);
-            done();
-          });
-      });
-    });
-  });
-
   describe('UPDATE /api/users/:id', function () {
     it('it should UPDATE a user with given id', function (done) {
-      var user1 = {
-        first_name: 'Chelsey',
+      var updatedUser = {
+        first_name: 'Justin',
         last_name: 'Bush',
-        email: 'cbush@gmail.com',
-        user_name: 'cbush',
-        password: 'letmein'
-      };
-
-      /*
-      var updateUser = {
-        first_name: 'Chelsey',
-        last_name: 'Bush',
-        email: 'cbush@gmail.com',
-        user_name: 'cbush',
-        password: 'letmein2'
-      };
-      */
-
-      var updateUser = {
+        email: 'jbush@gmail.com',
         password: 'letmein2'
       };
 
-      var newUser = new User(user1);
+      chai.request(app)
+        .put('/api/users/' + user1ID)
+        .set('Authorization', authTok1)
+        .send(updatedUser)
+        .end(function (err, res) {
+          if (err) return err;
 
-      newUser.save(function (err, user) {
-        if (err) { console.log(err); }
-        chai.request(app)
-          .put('/api/users/' + user._id)
-          .send(updateUser)
-          .end(function (err, res) {
-            if (err) { return err; } else {
-              res.should.have.status(200);
-              res.body.should.have.property('message').eql('User updated');
-              done();
-            }
-          });
-      });
+          res.should.have.status(200);
+          done();
+        });
     });
   });
 });

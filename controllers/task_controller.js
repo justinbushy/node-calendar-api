@@ -34,18 +34,24 @@ function listAllTasks (req, res) {
  * @param res
  */
 function listTasksByDate (req, res) {
-  var start_date = moment(req.params.event_date);
-  var next_date = start_date.clone().add(1, 'day');
+  console.log('task by date');
+  console.log(req.params.task_date);
+  var startDate = moment(req.params.task_date);
+  var nextDate = startDate.clone().add(1, 'day');
+  console.log('start');
+  console.log(startDate);
+  console.log('end');
+  console.log(nextDate);
 
-  Event.find({
+  Task.find({
     user_id: req.params.user_id,
-    start_time: { '$gte': start_date.toDate(), '$lt': next_date.toDate()}
-  }, function(err, events) {
-    if(err) {
+    task_date: { '$gte': startDate.toDate(), '$lt': nextDate.toDate() }
+  }, function (err, events) {
+    if (err) {
+      console.log('task by date err');
       console.log(err);
       res.send(err);
-    }
-    else {
+    } else {
       res.status(200)
         .json({
           status: 'success',
@@ -53,7 +59,7 @@ function listTasksByDate (req, res) {
           message: 'Retrieved all events for user on given date'
         });
     }
-    });
+  });
 }
 
 /**

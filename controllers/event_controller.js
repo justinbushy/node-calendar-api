@@ -78,18 +78,17 @@ function listOneEvent (req, res) {
  */
 function listEventsByDate (req, res) {
   console.log(req.params.event_date);
-  var start_date = moment(req.params.event_date);
-  var next_date = start_date.clone().add(1, 'day');
+  var startDate = moment(req.params.event_date);
+  var nextDate = startDate.clone().add(1, 'day');
   Event.find({
     user_id: req.params.user_id,
-    start_time: { "$gte": start_date.toDate(), "$lt" : next_date.toDate()}
-    },
-    function(err, events) {
+    start_time: { '$gte': startDate.toDate(), '$lt': nextDate.toDate() }
+  },
+    function (err, events) {
       if (err) {
         console.log(err);
         res.send(err);
-      }
-      else {
+      } else {
         res.status(200)
           .json({
             status: 'success',

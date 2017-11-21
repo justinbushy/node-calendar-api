@@ -13,6 +13,26 @@ var User = require('../models/user_model'); //eslint-disable-line
 chai.use(chaiHTTP);
 
 describe('Events', function () {
+  var userID = '';
+  var authTok = '';
+  before(function (done) {
+    var userLogin = {
+      email: 'b@gmail.com',
+      password: 'pass'
+    };
+
+    chai.request(app)
+      .post('/api/users/signin')
+      .send(userLogin)
+      .end(function (err, res) {
+        if (err) console.log(err);
+
+        userID = res.body.user_id;
+        authTok = 'JWT ' + res.body.token;
+        done();
+      });
+  });
+
   beforeEach(function (done) {
     /*
     var event_1 = {
@@ -36,7 +56,7 @@ describe('Events', function () {
   describe('/GET events', function () {
     it('it should GET a list of all events', function (done) {
       var event1 = {
-        user_id: '1111',
+        user_id: userID,
         title: 'Bart Day Care',
         description: 'Drop Bart off with Sandy',
         start_time: '2017-10-09T12:00:00.000Z',
@@ -51,6 +71,7 @@ describe('Events', function () {
 
         chai.request(app)
           .get('/api/users/' + newEvent.user_id + '/events')
+          .set('Authorization', authTok)
           .end(function (err, res) {
             if (err) return err;
 
@@ -71,7 +92,7 @@ describe('Events', function () {
   describe('/POST events', function () {
     it('it should POST and create new event', function (done) {
       var event1 = {
-        user_id: '1111',
+        user_id: userID,
         title: 'Bart Day Care',
         description: 'Drop Bart off with Sandy',
         start_time: '2017-10-09T12:00:00.000Z',
@@ -81,6 +102,7 @@ describe('Events', function () {
 
       chai.request(app)
         .post('/api/users/' + event1.user_id + '/events')
+        .set('Authorization', authTok)
         .send(event1)
         .end(function (err, res) {
           if (err) return err;
@@ -96,7 +118,7 @@ describe('Events', function () {
   describe('DELETE events', function () {
     it('it should DELETE an event with the given id', function (done) {
       var event1 = {
-        user_id: '1111',
+        user_id: userID,
         title: 'Bart Day Care',
         description: 'Drop Bart off with Sandy',
         start_time: '2017-10-09T12:00:00.000Z',
@@ -111,6 +133,7 @@ describe('Events', function () {
 
         chai.request(app)
           .delete('/api/users/' + event.user_id + '/events/' + event._id)
+          .set('Authorization', authTok)
           .end(function (err, res) {
             if (err) return err;
 
@@ -124,7 +147,7 @@ describe('Events', function () {
   describe('UPDATE events', function () {
     it('it should UPDATE an event with given id', function (done) {
       var event1 = {
-        user_id: '1111',
+        user_id: userID,
         title: 'Bart Day Care',
         description: 'Drop Bart off with Sandy',
         start_time: '2017-10-09T12:00:00.000Z',
@@ -133,7 +156,7 @@ describe('Events', function () {
       };
 
       var updateEvent = {
-        user_id: '1111',
+        user_id: userID,
         title: 'Bart Day Care',
         description: 'Drop Bart off with Sandy',
         start_time: '2017-10-09T12:00:00.000Z',
@@ -148,6 +171,7 @@ describe('Events', function () {
 
         chai.request(app)
           .put('/api/users/' + event.user_id + '/events/' + event._id)
+          .set('Authorization', authTok)
           .send(updateEvent)
           .end(function (err, res) {
             if (err) return err;

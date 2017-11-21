@@ -7,7 +7,7 @@ var jwt = require('jsonwebtoken');
 var user_mod = require('../models/user_model'); //eslint-disable-line
 var User = mongoose.model('User');
 
-var secret = process.env.JWT_SECRET ||  '26073B5085EF60DC6FD0BD416D8DDE5F4B71CF222A21C4BF1CD31485273C06B8'
+var secret = process.env.JWT_SECRET || '26073B5085EF60DC6FD0BD416D8DDE5F4B71CF222A21C4BF1CD31485273C06B8';
 
 /**
  * Route handler for 'GET /api/users'
@@ -73,12 +73,28 @@ function createUser (req, res) {
   var salt = bcrypt.genSaltSync(10);
   newUser.password = bcrypt.hashSync(req.body.password, salt);
   newUser.save(function (err, user) {
-    if (err) { res.send(err); }
-    res.status(200)
-      .json({
-        status: 'success',
-        message: 'Created User'
-      });
+    if (err) { return res.send(err); }
+
+    if (user) {
+      res.status(200)
+        .json({
+          status: 'success',
+          token: jwt.sign({
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            _id: user._id
+          }, secret),
+          user_id: user._id,
+          message: 'Created User'
+        });
+    } else {
+      res.status(409)
+        .json({
+          status: 'Conflict',
+          message: 'User already created'
+        });
+    }
   });
 }
 
@@ -144,24 +160,22 @@ function updateUser (req, res) {
     });
 }
 
-function login_required(req, res, next) {
+function loginRequired (req, res, next) {
   // jwt is authenticated first by middleware
   // If token is valid, then req.user is not undefined
-  if(req.user) {
+  if (req.user) {
     // check that the token contains requesting user id .
     var decoded = jwt.decode(req.headers.authorization.split(' ')[1]);
-    if(decoded._id !== req.params.user_id) {
+    if (decoded._id !== req.params.user_id) {
       res.status(401)
         .json({
           status: 'unauthorized',
           message: 'User unauthorized'
         });
-    }
-    else {
+    } else {
       next();
     }
-  }
-  else {
+  } else {
     res.status(401)
       .json({
         status: 'unauthorized',
@@ -170,7 +184,7 @@ function login_required(req, res, next) {
   }
 }
 
-function sign_in (req, res) {
+function signIn (req, res) {
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) { console.log(err); }
     if (!user) {
@@ -178,15 +192,13 @@ function sign_in (req, res) {
         .json({
           message: 'User not found'
         });
-    }
-    else if (user) {
+    } else if (user) {
       if (!user.comparePasswords(req.body.password)) {
         res.status(401)
           .json({
             message: 'Wrong password'
           });
-      }
-      else {
+      } else {
         res.status(200)
           .json({
             status: 'success',
@@ -210,6 +222,6 @@ module.exports = {
   create_user: createUser,
   remove_user: removeUser,
   update_user: updateUser,
-  login_required: login_required,
-  sign_in: sign_in
+  login_required: loginRequired,
+  sign_in: signIn
 };

@@ -8,11 +8,50 @@ var app = require('../app');
 var should = chai.should(); //eslint-disable-line
 var Pending = require('../models/pending_model');
 var Event = require('../models/event_model');
-var User = require('../models/user_model');
+// var User = require('../models/user_model');
 
 chai.use(chaiHTTP);
 
 describe('Pending', function () {
+  var user1ID = '';
+  var authTok1 = '';
+  var user2ID = '';
+  var authTok2 = '';
+
+  before(function (done) {
+    var userLogin1 = {
+      email: 'b@gmail.com',
+      password: 'pass'
+    };
+
+    var userLogin2 = {
+      email: 's@gmail.com',
+      password: 'pass'
+    };
+
+    chai.request(app)
+      .post('/api/users/signin')
+      .send(userLogin1)
+      .end(function (err, res) {
+        if (err) return err;
+
+        user1ID = res.body.user_id;
+        authTok1 = 'JWT ' + res.body.token;
+
+        chai.request(app)
+          .post('/api/users/signin')
+          .send(userLogin2)
+          .end(function (err, res) {
+            if (err) return err;
+
+            user2ID = res.body.user_id;
+            authTok2 = 'JWT ' + res.body.token;
+
+            done();
+          });
+      });
+  });
+
   beforeEach(function (done) {
     Pending.remove({}, function (err) {
       if (err) return err;
@@ -23,7 +62,7 @@ describe('Pending', function () {
   describe('/GET pending events', function () {
     it('it should GET a list of all pending events for user', function (done) {
       var pendingObj = {
-        user_id: '1111',
+        user_id: user1ID,
         pending_events: [ '1234', '23456' ],
         pending_friends: []
       };
@@ -35,6 +74,7 @@ describe('Pending', function () {
 
         chai.request(app)
           .get('/api/users/' + newPending.user_id + '/pending/events')
+          .set('Authorization', authTok1)
           .end(function (err, res) {
             if (err) return err;
 
@@ -53,7 +93,7 @@ describe('Pending', function () {
   describe('/GET pending friends', function () {
     it('it should GET a list of all pending friends for user', function (done) {
       var pendingObj = {
-        user_id: '1111',
+        user_id: user1ID,
         pending_events: [],
         pending_friends: [ '1112' ]
       };
@@ -65,6 +105,7 @@ describe('Pending', function () {
 
         chai.request(app)
           .get('/api/users/' + newPending.user_id + '/pending/friends')
+          .set('Authorization', authTok1)
           .end(function (err, res) {
             if (err) return err;
 
@@ -82,13 +123,14 @@ describe('Pending', function () {
   describe('/POST pending events', function () {
     it('it should POST and add to pending events', function (done) {
       var pendingObj = {
-        user_id: '1111',
+        user_id: user1ID,
         pending_events: [ '1234' ],
         pending_friends: []
       };
 
       chai.request(app)
         .post('/api/users/' + pendingObj.user_id + '/events/share')
+        .set('Authorization', authTok1)
         .send(pendingObj)
         .end(function (err, res) {
           if (err) return err;
@@ -104,13 +146,14 @@ describe('Pending', function () {
   describe('/POST pending friends', function () {
     it('it should POST and add to pending friends', function (done) {
       var pendingObj = {
-        user_id: '1111',
+        user_id: user1ID,
         pending_events: [],
         pending_friends: [ '1112' ]
       };
 
       chai.request(app)
         .post('/api/users/' + pendingObj.user_id + '/friends')
+        .set('Authorization', authTok1)
         .send(pendingObj)
         .end(function (err, res) {
           if (err) return err;
@@ -125,24 +168,8 @@ describe('Pending', function () {
 
   describe('/PUT pending events', function () {
     it('it should PUT and accept an event', function (done) {
-      var user1 = {
-        first_name: 'John',
-        last_name: 'Smith',
-        email: 'jsmith@ggg.com',
-        user_name: 'jsmith',
-        password: 'pass'
-      };
-
-      var user2 = {
-        first_name: 'Jenny',
-        last_name: 'Smith',
-        email: 'jensmith@ggg.com',
-        user_name: 'jensmith',
-        password: 'pass'
-      };
-
       var eventObj = {
-        user_id: '',
+        user_id: user1ID,
         title: 'Go on date',
         description: 'Dinner and a movie',
         start_time: '2017-10-20T18:00:00.000Z',
@@ -150,48 +177,36 @@ describe('Pending', function () {
         notes: ''
       };
 
+      // user1 is sharing with user2
       var pendingObj = {
-        user_id: '',
-        pending_events: [],
-        pending_friends: []
+        user_id: user2ID,
+        pending_events: []
       };
 
-      var newUser1 = new User(user1);
-      var newUser2 = new User(user2);
       var newEvent = new Event(eventObj);
-      var newPend = new Pending(pendingObj);
+      var newPending = new Pending(pendingObj);
 
-      // save user1
-      newUser1.save(function (err, retUser1) {
+      // save Event
+      newEvent.save(function (err, retEvent) {
         if (err) return err;
 
-        // save user2
-        newUser2.save(function (err, retUser2) {
+        newPending.pending_events.push(retEvent._id);
+        newPending.save(function (err, retPend) {
           if (err) return err;
 
-          // save event with user1 id
-          newEvent.user_id = retUser1._id;
-          newEvent.save(function (err, retEvent) {
-            if (err) return err;
+          var sendObj = { event_id: retEvent._id };
 
-            // save pending doc with user2 id
-            newPend.user_id = retUser2._id;
-            newPend.pending_events.push(retEvent._id);
-            newPend.save(function (err, pend) {
+          // user2 accepts the event
+          chai.request(app)
+            .put('/api/users/' + user2ID + '/pending/events')
+            .set('Authorization', authTok2)
+            .send(sendObj)
+            .end(function (err, res) {
               if (err) return err;
 
-              var sendObj = { event_id: newEvent._id };
-              chai.request(app)
-                .put('/api/users/' + retUser2._id + '/pending/events')
-                .send(sendObj)
-                .end(function (err, res) {
-                  if (err) return err;
-
-                  res.should.have.status(200);
-                  done();
-                });
+              res.should.have.status(200);
+              done();
             });
-          });
         });
       });
     });
@@ -199,6 +214,31 @@ describe('Pending', function () {
 
   describe('/PUT pending friends', function () {
     it('it should PUT and accept a friend', function (done) {
+      var pendingObj = {
+        user_id: user2ID,
+        pending_friends: []
+      };
+
+      var newPending = new Pending(pendingObj);
+      newPending.pending_friends.push(user1ID);
+
+      newPending.save(function (err, retPend) {
+        if (err) return err;
+
+        var sendObj = { user_id: user1ID };
+
+        chai.request(app)
+          .put('/api/users/' + user2ID + '/friends')
+          .set('Authorization', authTok2)
+          .send(sendObj)
+          .end(function (err, res) {
+            if (err) return err;
+
+            res.should.have.status(200);
+            done();
+          });
+      });
+      /*
       var user1 = {
         first_name: 'John',
         last_name: 'Smith',
@@ -250,7 +290,7 @@ describe('Pending', function () {
               });
           });
         });
-      });
+      }); */
     });
   });
 });

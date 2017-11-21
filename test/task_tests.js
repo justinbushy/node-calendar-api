@@ -12,6 +12,27 @@ var Task = require('../models/task_model');
 chai.use(chaiHTTP);
 
 describe('Tasks', function () {
+  var user1ID = '';
+  var authTok1 = '';
+
+  before(function (done) {
+    var userLogin1 = {
+      email: 'b@gmail.com',
+      password: 'pass'
+    };
+
+    chai.request(app)
+      .post('/api/users/signin')
+      .send(userLogin1)
+      .end(function (err, res) {
+        if (err) return err;
+
+        user1ID = res.body.user_id;
+        authTok1 = 'JWT ' + res.body.token;
+        done();
+      });
+  });
+
   beforeEach(function (done) {
     Task.remove({}, function (err) {
       if (err) { return err; }
@@ -22,7 +43,7 @@ describe('Tasks', function () {
   describe('/GET tasks', function () {
     it('it should GET a list of all tasks for the given user_id', function (done) {
       var task1 = {
-        user_id: '1111',
+        user_id: user1ID,
         title: 'Laundry',
         description: 'Wash, dry, fold',
         task_date: '2017-10-09T00:00:00.000Z',
@@ -35,7 +56,8 @@ describe('Tasks', function () {
         if (err) return err;
 
         chai.request(app)
-          .get('/api/users/' + newTask.user_id + '/tasks/')
+          .get('/api/users/' + user1ID + '/tasks/')
+          .set('Authorization', authTok1)
           .end(function (err, res) {
             if (err) return err;
 
@@ -56,7 +78,7 @@ describe('Tasks', function () {
   describe('POST tasks', function () {
     it('it should POST and create a task', function (done) {
       var task1 = {
-        user_id: '1111',
+        user_id: user1ID,
         title: 'Laundry',
         description: 'Wash, dry, fold',
         task_date: '2017-10-09T00:00:00.000Z',
@@ -64,7 +86,8 @@ describe('Tasks', function () {
       };
 
       chai.request(app)
-        .post('/api/users/' + task1.user_id + '/tasks/')
+        .post('/api/users/' + user1ID + '/tasks/')
+        .set('Authorization', authTok1)
         .send(task1)
         .end(function (err, res) {
           if (err) return err;
@@ -85,7 +108,7 @@ describe('Tasks', function () {
   describe('PUT tasks', function () {
     it('it should PUT and update a task', function (done) {
       var task1 = {
-        user_id: '1111',
+        user_id: user1ID,
         title: 'Laundry',
         description: 'Wash, dry, fold',
         task_date: '2017-10-09T00:00:00.000Z',
@@ -93,7 +116,7 @@ describe('Tasks', function () {
       };
 
       var updatedTask = {
-        user_id: '1111',
+        user_id: user1ID,
         title: 'Laundry',
         description: 'Wash, dry, fold, repeat',
         task_date: '2017-10-09T00:00:00.000Z',
@@ -106,7 +129,8 @@ describe('Tasks', function () {
         if (err) return err;
 
         chai.request(app)
-          .put('/api/users/' + task.user_id + '/tasks/' + task._id)
+          .put('/api/users/' + user1ID + '/tasks/' + task._id)
+          .set('Authorization', authTok1)
           .send(updatedTask)
           .end(function (err, res) {
             if (err) return err;
@@ -127,7 +151,7 @@ describe('Tasks', function () {
   describe('DELETE tasks', function () {
     it('it should DELETE and remove a task with given id', function (done) {
       var task1 = {
-        user_id: '1111',
+        user_id: user1ID,
         title: 'Laundry',
         description: 'Wash, dry, fold',
         task_date: Date.now(),
@@ -140,7 +164,8 @@ describe('Tasks', function () {
         if (err) return err;
 
         chai.request(app)
-          .delete('/api/users/' + newTask.user_id + '/tasks/' + newTask._id)
+          .delete('/api/users/' + user1ID + '/tasks/' + newTask._id)
+          .set('Authorization', authTok1)
           .end(function (err, res) {
             if (err) return err;
 

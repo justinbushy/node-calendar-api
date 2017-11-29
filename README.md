@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/justinbushy/node-calendar-api.svg?branch=master)](https://travis-ci.org/justinbushy/node-calendar-api)
 # node-calendar-api
 REST Calendar API built with Node.js, Express.js, and a MongoDB datastore.
 

@@ -216,6 +216,28 @@ function signIn (req, res) {
   });
 }
 
+function getFriends (req, res) {
+  console.log('Get Friends');
+  User.findOne({ _id: mongoose.Types.ObjectId(req.params.user_id) }, function (err, user) {
+    if (err) { return res.send(err); }
+    if (user) {
+      User.find({
+        '_id': { $in: user.friends }
+      }, function (err, users) {
+        if (err) { return res.send(err); }
+        res.status(200)
+          .json({
+            status: 'success',
+            friends: users,
+            message: 'Retrieved all friends'
+          });
+      });
+    } else {
+      console.log('No User Found');
+    }
+  });
+}
+
 module.exports = {
   list_all_users: listAllUsers,
   list_one_users: listOneUser,
@@ -223,5 +245,6 @@ module.exports = {
   remove_user: removeUser,
   update_user: updateUser,
   login_required: loginRequired,
-  sign_in: signIn
+  sign_in: signIn,
+  list_friends: getFriends
 };

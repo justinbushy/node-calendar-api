@@ -97,26 +97,29 @@ function addToPendingEvents (req, res) {
  *
  * Expected body format from client:
  * {
- *    user_id: String
+ *    user_name: String
  * }
  *
  * @param req
  * @param res
  */
 function addToPendingFriends (req, res) {
-  Pending.findOneAndUpdate(
-    { user_id: req.body.user_id },
-    { $push: { pending_friends: req.params.user_id } },
-    { upsert: true },
-    function (err) {
-      if (err) { console.log(err); } else {
-        res.status(200)
-          .json({
-            status: 'success',
-            message: 'Added friend to users pending friends'
-          });
-      }
-    });
+  User.findOne({ user_name: req.body.user_name }, function (err, user) {
+    if (err) { return console.log(err); }
+    Pending.findOneAndUpdate(
+      { user_id: user._id },
+      { $push: { pending_friends: req.params.user_id } },
+      { upsert: true },
+      function (err) {
+        if (err) { console.log(err); } else {
+          res.status(200)
+            .json({
+              status: 'success',
+              message: 'Added friend to users pending friends'
+            });
+        }
+      });
+  });
 }
 
 /**

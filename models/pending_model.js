@@ -7,7 +7,7 @@ var PendingSchema = new Schema({
 
   user_id: {
     type: String,
-    required: 'User ID is required'
+    required: 'User Name is required'
   },
   pending_events: [String],
   pending_friends: [String]

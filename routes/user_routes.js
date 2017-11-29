@@ -15,4 +15,7 @@ router.delete('/users/:user_id', users.remove_user);
 // sign in
 router.post('/users/signin', users.sign_in);
 
+// Friends
+router.get('/users/:user_id/friends', users.list_friends);
+
 module.exports = router;

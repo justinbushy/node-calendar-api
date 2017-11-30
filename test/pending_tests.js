@@ -8,7 +8,7 @@ var app = require('../app');
 var should = chai.should(); //eslint-disable-line
 var Pending = require('../models/pending_model');
 var Event = require('../models/event_model');
-var User = require('../models/user_model');
+// var User = require('../models/user_model');
 
 chai.use(chaiHTTP);
 
@@ -17,6 +17,7 @@ describe('Pending', function () {
   var authTok1 = '';
   var user2ID = '';
   var authTok2 = '';
+  // var username1 = 'bsmith';
 
   before(function (done) {
     var userLogin1 = {
@@ -35,6 +36,26 @@ describe('Pending', function () {
       password: 'pass'
     };
 
+    chai.request(app)
+      .post('/api/users/signin')
+      .send(userLogin1)
+      .end(function (err, res) {
+        if (err) return err;
+
+        user1ID = res.body.user_id;
+        authTok1 = 'JWT ' + res.body.token;
+        chai.request(app)
+          .post('/api/users/signin')
+          .send(userLogin2)
+          .end(function (err, res) {
+            if (err) return err;
+
+            user2ID = res.body.user_id;
+            authTok2 = 'JWT ' + res.body.token;
+            done();
+          });
+      });
+    /*
     User.remove({ user_name: { $in: [ userLogin1.user_name, userLogin2.user_name ] } },
       function (err) {
         if (err) return console.log(err);
@@ -57,28 +78,6 @@ describe('Pending', function () {
                 authTok2 = 'JWT ' + res.body.token;
                 done();
               });
-          });
-      });
-   /*
-    chai.request(app)
-      .post('/api/users/signin')
-      .send(userLogin1)
-      .end(function (err, res) {
-        if (err) return err;
-
-        user1ID = res.body.user_id;
-        authTok1 = 'JWT ' + res.body.token;
-
-        chai.request(app)
-          .post('/api/users/signin')
-          .send(userLogin2)
-          .end(function (err, res) {
-            if (err) return err;
-
-            user2ID = res.body.user_id;
-            authTok2 = 'JWT ' + res.body.token;
-
-            done();
           });
       }); */
   });
@@ -177,13 +176,11 @@ describe('Pending', function () {
   describe('/POST pending friends', function () {
     it('it should POST and add to pending friends', function (done) {
       var pendingObj = {
-        user_id: user1ID,
-        pending_events: [],
-        pending_friends: [ '1112' ]
+        user_id: user2ID
       };
 
       chai.request(app)
-        .post('/api/users/' + pendingObj.user_id + '/friends')
+        .post('/api/users/' + user1ID + '/friends')
         .set('Authorization', authTok1)
         .send(pendingObj)
         .end(function (err, res) {

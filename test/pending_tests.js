@@ -17,7 +17,7 @@ describe('Pending', function () {
   var authTok1 = '';
   var user2ID = '';
   var authTok2 = '';
-  // var username1 = 'bsmith';
+  var username2 = 'ssmith';
 
   before(function (done) {
     var userLogin1 = {
@@ -181,7 +181,7 @@ describe('Pending', function () {
   describe('/POST pending friends', function () {
     it('it should POST and add to pending friends', function (done) {
       var pendingObj = {
-        user_id: user2ID
+        user_name: username2
       };
 
       chai.request(app)
